@@ -11,7 +11,7 @@
 * Wi - peso atual da mochila ao sair da cidade i
 * Mi - conjunto de itens de cada cidade
 * Pik e Wik - preço e peso do item mi
----
+
 ### Restrições
 * Todos partem da primeira cidade.
 * Cada ladrão tem uma velocidade de acordo com o peso de sua mochila.
