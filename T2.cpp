@@ -140,6 +140,30 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	}
 }
 
+double cost(const vector<Cit){
+
+
+	double total = 0.0;
+	// Start from city 1 because a true thief never steals from home
+	for(int i=1; i<cities.size(); i++)
+		for(int j=0; j<items.size(); j++)
+			if(!cities[i].items[j].taken) 
+				total += cities[i].items[j].profit;
+	
+	double currPenalty = 0.0;
+	double v = (vMax - vMin)/W; // Defined in the problem description
+	for(int i=0; i<gang.size(); i++){
+		
+		for(int j=0; j<cities.size()-1; j++)
+			currPenalty += adj[j][j+1]/(vMax-v*gang[i].capacity);
+
+		// Coming back home
+		currPenalty += adj[cities.size()-2][cities.size()-1]/(vMax - v*gang[i].capacity; 
+	}
+
+	total -= R*currPenalty;
+}
+
 int main() {
 
 	string name, type;
