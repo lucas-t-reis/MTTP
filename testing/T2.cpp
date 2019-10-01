@@ -21,7 +21,6 @@ struct Item{
 struct Thief{
 	list <Node> route;
 	int capacity;
-	double speed;
 };
 
 vector <City> cities;
@@ -95,7 +94,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	W = temp[2];
 
 	k=0;
-	while(k<3) readNum(temp[0],tempDouble[k++], -1);
+	while(k<3) readNum(temp[0],tempDouble[k++], false);
 	
 	vMin = tempDouble[0];
 	vMax = tempDouble[1];
@@ -128,7 +127,8 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 		}
 	}
 
-	cin.ignore();
+	// Ignoring last line from header
+	getline(cin, line);
 
 	// Copying items
 	getline(cin, line);
@@ -140,7 +140,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 
 		cin >> id >> p >> w >> idCity;
 	
-		items[i] = {p, w, false};
+		items[i] = {p, w, -1};
 		cities[idCity - 1].items.push_back(i);
 	}
 }
@@ -150,12 +150,13 @@ double cost(double vMax, double vMin, int W, double R){
 
 	double total = 0.0;
 	// Start from city 1 because a true thief never steals from home
-	for(int j = 0; j < items.size(); j++)
-		if(items[j].thief != -1) 
-			total += items[j].profit;
-	
+	for(int i = 0; i < items.size(); i++)
+		if(items[i].thief != -1) 
+			total += items[i].profit;
+
 	double currPenalty = 0.0;
 	double v = (vMax - vMin)/W; // Defined in the problem description
+	
 	for(int i=0; i < gang.size(); i++){
 
 		int capacity = 0;
@@ -173,15 +174,13 @@ double cost(double vMax, double vMin, int W, double R){
 			currPenalty += adj[a][b]/(vMax - v * capacity);
 		}
 
-		capacity += end.capacity;
-		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
-
 		// Coming back home
-		currPenalty += adj[cities.size()-2][cities.size()-1]/(vMax - v*gang[i].capacity); 
+		capacity += end.capacity;
+		currPenalty += adj[end.id][first.id]/(vMax - v * capacity); 
 	}
 
 	total -= R * currPenalty;
-
+	
 	return total;
 }
 
@@ -201,15 +200,4 @@ int main() {
 	cout << vMin << endl;
 	cout << vMax << endl;
 	cout << R << endl;
-	
-	cout << "Cities" << endl;
-
-	int cont = 0;
-
-	for(int i = 0; i < V; i++){
-		for(int j = 0; j < V; j++){
-			cout << adj[i][j] << " ";
-		}
-		cout << "\n";
-	}
 }
