@@ -6,15 +6,20 @@ struct City{
 	vector <int> items;
 };
 
+struct Node{
+	int id;
+	list <int> items;
+	int capacity;
+};
+
 struct Item{
 	int profit;
 	int weight;
-	bool taken;
+	int thief;
 };
 
 struct Thief{
-	vector <int> route;
-	vector <int> bag;
+	list <Node> route;
 	int capacity;
 	double speed;
 };
@@ -90,7 +95,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	W = temp[2];
 
 	k=0;
-	while(k<3) readNum(temp[0],tempDouble[k++],false);
+	while(k<3) readNum(temp[0],tempDouble[k++], -1);
 	
 	vMin = tempDouble[0];
 	vMax = tempDouble[1];
@@ -140,28 +145,44 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	}
 }
 
-double cost(const vector<Cit){
+double cost(double vMax, double vMin, int W, double R){
 
 
 	double total = 0.0;
 	// Start from city 1 because a true thief never steals from home
-	for(int i=1; i<cities.size(); i++)
-		for(int j=0; j<items.size(); j++)
-			if(!cities[i].items[j].taken) 
-				total += cities[i].items[j].profit;
+	for(int j = 0; j < items.size(); j++)
+		if(items[j].thief != -1) 
+			total += items[j].profit;
 	
 	double currPenalty = 0.0;
 	double v = (vMax - vMin)/W; // Defined in the problem description
-	for(int i=0; i<gang.size(); i++){
-		
-		for(int j=0; j<cities.size()-1; j++)
-			currPenalty += adj[j][j+1]/(vMax-v*gang[i].capacity);
+	for(int i=0; i < gang.size(); i++){
+
+		int capacity = 0;
+
+		auto first = gang[i].route.front();
+		auto end = gang[i].route.back();
+
+		for(auto j = gang[i].route.begin(); next(j) != gang[i].route.end(); j++){
+			
+			capacity += j->capacity;
+
+			int a = j->id;
+			int b = (next(j))->id;
+			
+			currPenalty += adj[a][b]/(vMax - v * capacity);
+		}
+
+		capacity += end.capacity;
+		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
 
 		// Coming back home
-		currPenalty += adj[cities.size()-2][cities.size()-1]/(vMax - v*gang[i].capacity; 
+		currPenalty += adj[cities.size()-2][cities.size()-1]/(vMax - v*gang[i].capacity); 
 	}
 
-	total -= R*currPenalty;
+	total -= R * currPenalty;
+
+	return total;
 }
 
 int main() {
