@@ -2,24 +2,36 @@
 using namespace std;
 
 struct City{
+	City(){}
+	City(double x_, double y_, const vector<int>&items_, int remainingItems_) : x(x_), y(y_), items(items_), 
+	remainingItems(remainingItems_){}
 	double x, y;
 	vector <int> items;
+	int remainingItems;
 };
 
 struct Node{
+	Node(){}
+	Node(int id_, const vector<int> &items_, int capacity_) : id(id_), items(items_), capacity(capacity_){}
 	int id;
-	list <int> items;
+	vector <int> items;
 	int capacity;
 };
 
 struct Item{
+	Item(){}
+	Item(int profit_, int weight_, int thief_, int city_) : profit(profit_), weight(weight_), thief(thief_),
+	city(city_){}
 	int profit;
 	int weight;
 	int thief;
+	int city;
 };
 
 struct Thief{
-	list <Node> route;
+	Thief(){}
+	Thief(const vector<Node> &route_, int capacity_) : route(route_), capacity(capacity_) {}
+	vector <Node> route;
 	int capacity;
 };
 
@@ -27,6 +39,12 @@ vector <City> cities;
 vector <Item> items;
 vector <Thief> gang;
 vector <vector <double>> adj;
+int gangCapacity = 0;
+
+
+string name, type;
+int V, M, W;
+double vMin, vMax, R;
 
 
 double dist(int a, int b){
@@ -116,7 +134,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 
 		cin >> id >> x >> y;
 	
-		cities[i] = {x, y, vector<int>()};
+		cities[i] = {x, y, vector<int>(), 0};
 	}
 
 	adj.resize(V);
@@ -140,10 +158,115 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 
 		cin >> id >> p >> w >> idCity;
 	
-		items[i] = {p, w, -1};
+		items[i] = {p, w, -1, idCity - 1};
 		cities[idCity - 1].items.push_back(i);
+		cities[idCity - 1].remainingItems++;
 	}
 }
+
+int closestCity(int thiefId, int cityId){
+	int best = adj[gang[thiefId].route[0].id][cityId];
+	int bestI = 0;
+	for(int i = 1; i < gang[thiefId].route.size(); i++){
+		int from = gang[thiefId].route[i].id;
+		if(best > adj[from][cityId]){
+			best = adj[from][cityId];
+			bestI = i;
+		}
+	}
+
+	return bestI;
+}
+
+/*Vizinhanças*/
+
+pair<int, int> opt2(int id){
+
+	int a = rand() % (gang[id].route.size() - 1) + 1;
+	int b = rand() % (gang[id].route.size() - 1) + 1;
+	
+	swap(gang[id].route[a], gang[id].route[b]);
+	
+	return make_pair(a, b);
+}
+
+
+pair<pair<int, int>, pair<int , int>> opt4(int id){
+	
+	int a = rand() % (gang[id].route.size() - 1) + 1;
+	int b = rand() % (gang[id].route.size() - 1) + 1;
+	int c = rand() % (gang[id].route.size() - 1) + 1;
+	int d = rand() % (gang[id].route.size() - 1) + 1;
+	
+	swap(gang[id].route[a], gang[id].route[b]);
+	swap(gang[id].route[c], gang[id].route[d]);
+	
+	auto p1 = make_pair(a, b);
+	auto p2 = make_pair(c, d);
+
+	return make_pair(p1,p2);
+}
+
+pair<int, Node> removeCity(int id){
+	int cityId = rand() % (gang[id].route.size() - 1) + 1;
+
+	auto p = make_pair(cityId, gang[id].route[cityId]);
+	
+	gang[id].route.erase(gang[id].route.begin() + cityId);
+	
+	return p;
+}
+
+pair<int, int> removeItem(int id){
+	int cityId = rand() % (gang[id].route.size() - 1) + 1;
+	int itemId = rand() % gang[id].route[cityId].items.size();
+
+	gang[id].route[cityId].items.erase(gang[id].route[cityId].items.begin() + itemId);
+	gang[id].route[cityId].capacity -= items[itemId].weight;
+	items[itemId].thief = -1;
+
+	return make_pair(cityId, itemId);
+}
+
+pair<int, int> addItem(int id){
+	int cont = 0;
+	int itemId;
+	do{
+		itemId = rand() % items.size();
+	}while((items[itemId].thief != -1 || items[itemId].weight + gangCapacity > W)  && cont++ < 100);
+
+	if(cont >= 100){
+		itemId = -1;
+		for(int i = 0; i < items.size(); i++){
+			if(items[i].thief == -1){
+				itemId = i;
+				break;
+			}
+		}
+		if(itemId == -1) return make_pair(-1, -1);
+	}
+
+	gangCapacity += items[itemId].weight;
+	items[itemId].thief = id;
+
+	for(int i = 0; i < gang[id].route.size(); i++){
+		if(items[itemId].city == gang[id].route[i].id){
+			gang[id].route[i].items.push_back(itemId);
+			gang[id].route[i].capacity += items[itemId].weight;
+			return make_pair(itemId, -1 * items[itemId].city);
+		}
+	}
+
+	int bestPlace = closestCity(id, items[itemId].city);
+	if(bestPlace)
+		gang[id].route.insert(gang[id].route.begin() + bestPlace, Node(items[itemId].city, {itemId}, items[itemId].weight));
+	else
+		gang[id].route.push_back(Node(items[itemId].city, {itemId}, items[itemId].weight));
+
+	return make_pair(itemId, bestPlace);
+}
+
+/**/
 
 double cost(double vMax, double vMin, int W, double R){
 
@@ -164,19 +287,21 @@ double cost(double vMax, double vMin, int W, double R){
 		auto first = gang[i].route.front();
 		auto end = gang[i].route.back();
 
-		for(auto j = gang[i].route.begin(); next(j) != gang[i].route.end(); j++){
+		for(int j = 0; j < gang[i].route.size() - 1; j++){
 			
-			capacity += j->capacity;
+			capacity += gang[i].route[j].capacity;
 
-			int a = j->id;
-			int b = (next(j))->id;
+			int a = gang[i].route[j].id;
+			int b = gang[i].route[j + 1].id;
 			
+			cerr << adj[a][b]/(vMax - v * capacity) << endl;
 			currPenalty += adj[a][b]/(vMax - v * capacity);
 		}
 
 		// Coming back home
 		capacity += end.capacity;
-		currPenalty += adj[end.id][first.id]/(vMax - v * capacity); 
+		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
+		cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
 	}
 
 	total -= R * currPenalty;
@@ -185,19 +310,22 @@ double cost(double vMax, double vMin, int W, double R){
 }
 
 int main() {
+	srand(time(NULL));
 
-	string name, type;
-	int V, M, W;
-	double vMin, vMax, R;
 	readInstance(name, type, V, M, W, vMin, vMax, R);
-	
-	// Conferindo entrada...
-	cout << name << endl;
-	cout << type << endl;
-	cout << V << endl;
-	cout << M << endl;
-	cout << W << endl;
-	cout << vMin << endl;
-	cout << vMax << endl;
-	cout << R << endl;
+
+	gang.push_back(Thief(vector<Node>(4), 12));
+	gang[0].route[0] = Node(0, vector<int>(), 0);
+	gang[0].route[1] = Node(1, {0, 1}, 5);
+	gang[0].route[2] = Node(2, {2, 3, 4}, 5);
+	//gang[0].route[3] = Node(3, {5}, 2);
+
+	for(int i = 0; i < items.size(); i++) items[i].thief = 0;
+	items[5].thief = -1;
+	gangCapacity = 10;
+
+	auto p =addItem(0);
+	cout << p.first << " " << p.second << endl;
+	cout << cost(vMax, vMin, W, R) << endl;
+
 }
