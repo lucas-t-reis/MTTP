@@ -11,7 +11,7 @@ struct City{
 };
 
 struct Node{
-	Node(){}
+	Node(): id(0), capacity(0){}
 	Node(int id_, const vector<int> &items_, int capacity_) : id(id_), items(items_), capacity(capacity_){}
 	int id;
 	vector <int> items;
@@ -29,7 +29,7 @@ struct Item{
 };
 
 struct Thief{
-	Thief(){}
+	Thief():capacity(0), route(vector<Node>(1, Node())){}
 	Thief(const vector<Node> &route_, int capacity_) : route(route_), capacity(capacity_) {}
 	vector <Node> route;
 	int capacity;
@@ -294,14 +294,14 @@ double cost(double vMax, double vMin, int W, double R){
 			int a = gang[i].route[j].id;
 			int b = gang[i].route[j + 1].id;
 			
-			cerr << adj[a][b]/(vMax - v * capacity) << endl;
+			//cerr << adj[a][b]/(vMax - v * capacity) << endl;
 			currPenalty += adj[a][b]/(vMax - v * capacity);
 		}
 
 		// Coming back home
 		capacity += end.capacity;
 		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
-		cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
+		//cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
 	}
 
 	total -= R * currPenalty;
@@ -309,23 +309,93 @@ double cost(double vMax, double vMin, int W, double R){
 	return total;
 }
 
-int main() {
+void greedyInitialSolution(int numThiefs){
+
+	vector<int>actualPos(numThiefs, 0);
+	vector<bool>ended(numThiefs, false);
+
+	double v = (vMax - vMin)/W;
+
+	bool hasOption = true;
+	while(hasOption){
+		hasOption = false;
+		for(int i = 0; i < numThiefs; i++){
+			if(ended[i])
+				continue;
+
+			int bestValue = 0;
+			int bestItem = -1;
+
+			for(int j = 0; j < M; j++){
+				if(items[j].weight + gangCapacity > W || items[j].thief != -1)
+					continue;
+				
+				double goingCost = adj[actualPos[i]][items[j].city]/(vMax - v * gang[i].capacity);
+				double returnCost = adj[items[j].city][0]/(vMax - v * (gang[i].capacity + items[j].weight));
+				
+				//cout << items[j].profit - goingCost - returnCost << " " << bestValue << " " << i <<" " << j << endl;
+				
+				if(items[j].profit - goingCost - returnCost > bestValue){
+					bestValue = items[j].profit - goingCost - returnCost;
+					bestItem = j;
+					hasOption = true;
+				}
+			}
+
+			if(bestItem == -1){
+				actualPos[i] = 0;
+				ended[0] = true;
+			}
+			else{
+				if(gang[i].route.empty() || gang[i].route.back().id != items[bestItem].city){
+					gang[i].route.push_back(Node());
+					gang[i].route.back().id = items[bestItem].city;
+					gang[i].route.back().capacity = 0;
+				}
+				gang[i].route.back().items.push_back(bestItem);
+				gang[i].route.back().capacity += items[bestItem].weight;
+				gang[i].capacity += items[bestItem].weight;
+				gangCapacity += items[bestItem].weight;
+				items[bestItem].thief = i;
+				actualPos[i] = items[bestItem].city;
+				//cout << cost(vMax, vMin, W, R) << endl << endl;
+			}
+		}
+	}
+}
+
+int main(int argc, char **argv) {
 	srand(time(NULL));
 
 	readInstance(name, type, V, M, W, vMin, vMax, R);
 
-	gang.push_back(Thief(vector<Node>(4), 12));
-	gang[0].route[0] = Node(0, vector<int>(), 0);
-	gang[0].route[1] = Node(1, {0, 1}, 5);
-	gang[0].route[2] = Node(2, {2, 3, 4}, 5);
-	//gang[0].route[3] = Node(3, {5}, 2);
+	int numThiefs = atoi(argv[1]);
+	gang.resize(numThiefs);
 
-	for(int i = 0; i < items.size(); i++) items[i].thief = 0;
-	items[5].thief = -1;
-	gangCapacity = 10;
+	greedyInitialSolution(numThiefs);
 
-	auto p =addItem(0);
-	cout << p.first << " " << p.second << endl;
+	// for(int i = 0; i < numThiefs; i++){
+	// 	for(auto j:gang[i].route){
+	// 		cout << j.id << " ";
+	// 	}
+	// 	cout << endl;
+	// }
+
 	cout << cost(vMax, vMin, W, R) << endl;
+	cout << gangCapacity << " " << W << endl;
+
+	// gang.push_back(Thief(vector<Node>(4), 12));
+	// gang[0].route[0] = Node(0, vector<int>(), 0);
+	// gang[0].route[1] = Node(1, {0, 1}, 5);
+	// gang[0].route[2] = Node(2, {2, 3, 4}, 5);
+	// //gang[0].route[3] = Node(3, {5}, 2);
+
+	// for(int i = 0; i < items.size(); i++) items[i].thief = 0;
+	// items[5].thief = -1;
+	// gangCapacity = 10;
+
+	// auto p =addItem(0);
+	// cout << p.first << " " << p.second << endl;
+	// cout << cost(vMax, vMin, W, R) << endl;
 
 }
