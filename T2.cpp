@@ -38,7 +38,7 @@ struct Thief{
 vector <City> cities;
 vector <Item> items;
 vector <Thief> gang;
-vector <vector <long double>> adj;
+vector <vector <int>> adj;
 int gangCapacity = 0;
 
 
@@ -47,8 +47,8 @@ int V, M, W;
 long double vMin, vMax, R;
 
 
-long double dist(int a, int b){
-	return sqrt((cities[a].x - cities[b].x) * (cities[a].x - cities[b].x) + (cities[a].y - cities[b].y) * (cities[a].y - cities[b].y)); 
+int dist(int a, int b){
+	return ceil(sqrt((cities[a].x - cities[b].x) * (cities[a].x - cities[b].x) + (cities[a].y - cities[b].y) * (cities[a].y - cities[b].y))); 
 }
 
 void readNum(int &a, long double &b, bool isInteger){
@@ -302,11 +302,14 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 			
 			//cerr << adj[a][b]/(vMax - v * capacity) << endl;
 			currPenalty += adj[a][b]/(vMax - v * capacity);
+			cerr << i << " " << adj[a][b]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
 		}
 
 		// Coming back home
 		capacity += end.capacity;
 		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
+		cerr << i << " " << adj[end.id][first.id]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
+		cerr << endl;
 		//cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
 	}
 
@@ -368,7 +371,7 @@ void greedyInitialSolution(int numThiefs){
 				gangCapacity += items[bestItem].weight;
 				items[bestItem].thief = i;
 				actualPos[i] = items[bestItem].city;
-				cerr << cost(vMax, vMin, W, R) << endl << endl;
+				//cerr << cost(vMax, vMin, W, R) << endl << endl;
 			}
 		}
 	}
@@ -416,6 +419,7 @@ int main(int argc, char **argv) {
 
 	for(int i = 0; i < gang.size(); i++){
 		vector<int>I;
+		int cap = 0;
 		for(int j = 1; j < gang[i].route.size(); j++){
 			if(j != gang[i].route.size() - 1)
 				cout << gang[i].route[j].id + 1 << ",";
@@ -426,7 +430,6 @@ int main(int argc, char **argv) {
 				//s.insert(gang[i].route[j].items[k]);
 			}
 		}
-		cout << endl;
 		bool virg = false;
 		for(auto j:I){
 			if(!virg){
