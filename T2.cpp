@@ -3,9 +3,9 @@ using namespace std;
 
 struct City{
 	City(){}
-	City(double x_, double y_, const vector<int>&items_, int remainingItems_) : x(x_), y(y_), items(items_), 
+	City(long double x_, long double y_, const vector<int>&items_, int remainingItems_) : x(x_), y(y_), items(items_), 
 	remainingItems(remainingItems_){}
-	double x, y;
+	long double x, y;
 	vector <int> items;
 	int remainingItems;
 };
@@ -38,20 +38,20 @@ struct Thief{
 vector <City> cities;
 vector <Item> items;
 vector <Thief> gang;
-vector <vector <double>> adj;
+vector <vector <long double>> adj;
 int gangCapacity = 0;
 
 
 string name, type;
 int V, M, W;
-double vMin, vMax, R;
+long double vMin, vMax, R;
 
 
-double dist(int a, int b){
+long double dist(int a, int b){
 	return sqrt((cities[a].x - cities[b].x) * (cities[a].x - cities[b].x) + (cities[a].y - cities[b].y) * (cities[a].y - cities[b].y)); 
 }
 
-void readNum(int &a, double &b, bool isInteger){
+void readNum(int &a, long double &b, bool isInteger){
 
 	stringstream ss;
 	string line;
@@ -74,7 +74,7 @@ void readNum(int &a, double &b, bool isInteger){
 	}
 }
 
-void readInstance(string &name, string &type, int &V, int &M, int &W, double &vMin, double &vMax, double &R){
+void readInstance(string &name, string &type, int &V, int &M, int &W, long double &vMin, long double &vMax, long double &R){
 	// Reading name and type	
 	stringstream ss;
 	string line;
@@ -103,7 +103,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	// Getting the numeric part of the data
 	int k=0;
 	int temp[3] = {0};
-	double tempDouble[3] = {0.0};
+	long double tempDouble[3] = {0.0};
 
 	while(k<3) readNum(temp[k++],tempDouble[0],true);
 	
@@ -130,7 +130,7 @@ void readInstance(string &name, string &type, int &V, int &M, int &W, double &vM
 	
 	for(int i = 0; i < V; i++){
 		int id;
-		double x, y;
+		long double x, y;
 
 		cin >> id >> x >> y;
 	
@@ -268,10 +268,10 @@ pair<int, int> addItem(int id){
 
 /**/
 
-double cost(double vMax, double vMin, int W, double R){
+long double cost(long double vMax, long double vMin, int W, long double R){
 
 
-	double total = 0.0;
+	long double total = 0.0;
 	// Start from city 1 because a true thief never steals from home
 	for(int i = 0; i < items.size(); i++){
 		if(items[i].thief != -1){ 
@@ -279,12 +279,12 @@ double cost(double vMax, double vMin, int W, double R){
 			//cerr << i << " ";
 		}
 	}
-	cerr << endl;
+	// cerr << endl;
 
-	cerr << "Profit: " << total << endl;
+	// cerr << "Profit: " << total << endl;
 
-	double currPenalty = 0.0;
-	double v = (vMax - vMin)/W; // Defined in the problem description
+	long double currPenalty = 0.0;
+	long double v = (vMax - vMin)/W; // Defined in the problem description
 	
 	for(int i=0; i < gang.size(); i++){
 
@@ -312,7 +312,7 @@ double cost(double vMax, double vMin, int W, double R){
 
 	total -= R * currPenalty;
 
-	cerr << "Penalty: " << R * currPenalty << endl;
+	//cerr << "Penalty: " << R * currPenalty << endl;
 	
 	return total;
 }
@@ -322,7 +322,7 @@ void greedyInitialSolution(int numThiefs){
 	vector<int>actualPos(numThiefs, 0);
 	vector<bool>ended(numThiefs, false);
 
-	double v = (vMax - vMin)/W;
+	long double v = (vMax - vMin)/W;
 
 	bool hasOption = true;
 	while(hasOption){
@@ -331,15 +331,15 @@ void greedyInitialSolution(int numThiefs){
 			if(ended[i])
 				continue;
 
-			double bestValue = 0.0;
+			long double bestValue = 0.0;
 			int bestItem = -1;
 
 			for(int j = 0; j < M; j++){
 				if(items[j].weight + gangCapacity > W || items[j].thief != -1)
 					continue;
 				
-				double goingCost = adj[actualPos[i]][items[j].city]/(vMax - v * gang[i].capacity);
-				double returnCost = adj[items[j].city][0]/(vMax - v * (gang[i].capacity + items[j].weight));
+				long double goingCost = adj[actualPos[i]][items[j].city]/(vMax - v * gang[i].capacity);
+				long double returnCost = adj[items[j].city][0]/(vMax - v * (gang[i].capacity + items[j].weight));
 				
 				//cout << actualPos[i] << " " << items[j].profit - goingCost - returnCost << " " << bestValue << " " << i <<" " << j << " " << items[j].city << endl;
 				
@@ -368,7 +368,7 @@ void greedyInitialSolution(int numThiefs){
 				gangCapacity += items[bestItem].weight;
 				items[bestItem].thief = i;
 				actualPos[i] = items[bestItem].city;
-				//cout << cost(vMax, vMin, W, R) << endl << endl;
+				cerr << cost(vMax, vMin, W, R) << endl << endl;
 			}
 		}
 	}
@@ -386,6 +386,7 @@ void fixRoute(int index){
 	for(int i = 0; i < gang[index].route.size(); i++){
 		for(int j = i + 1; j < gang[index].route.size(); j++){
 			if(gang[index].route[i].id == gang[index].route[j].id ){
+				cerr << "Fixed: " << i << " " << j << " " << gang[index].route[j].id << endl;
 				joinNodes(index, i, j);
 				i--;
 				j--;
