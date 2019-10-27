@@ -302,14 +302,14 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 			
 			//cerr << adj[a][b]/(vMax - v * capacity) << endl;
 			currPenalty += adj[a][b]/(vMax - v * capacity);
-			cerr << i << " " << adj[a][b]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
+			//cerr << i << " " << adj[a][b]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
 		}
 
 		// Coming back home
 		capacity += end.capacity;
 		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
-		cerr << i << " " << adj[end.id][first.id]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
-		cerr << endl;
+		//cerr << i << " " << adj[end.id][first.id]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
+		//cerr << endl;
 		//cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
 	}
 
@@ -320,7 +320,7 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 	return total;
 }
 
-void greedyInitialSolution(int numThiefs){
+void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 
 	vector<int>actualPos(numThiefs, 0);
 	vector<bool>ended(numThiefs, false);
@@ -333,45 +333,50 @@ void greedyInitialSolution(int numThiefs){
 		for(int i = 0; i < numThiefs; i++){
 			if(ended[i])
 				continue;
+			int availableMoves = numMoves;
+			while(availableMoves--){
+				long double bestValue = 0.0;
+				int bestItem = -1;
 
-			long double bestValue = 0.0;
-			int bestItem = -1;
+				for(int j = 0; j < M; j++){
+					if(items[j].weight + gangCapacity > W || items[j].thief != -1)
+						continue;
+					
+					long double goingCost = R * adj[actualPos[i]][items[j].city]/(vMax - v * gang[i].capacity);
+					long double returnCost = R * adj[items[j].city][0]/(vMax - v * (gang[i].capacity + items[j].weight));
+					
+					if(!safe) returnCost = 0;
 
-			for(int j = 0; j < M; j++){
-				if(items[j].weight + gangCapacity > W || items[j].thief != -1)
-					continue;
-				
-				long double goingCost = adj[actualPos[i]][items[j].city]/(vMax - v * gang[i].capacity);
-				long double returnCost = adj[items[j].city][0]/(vMax - v * (gang[i].capacity + items[j].weight));
-				
-				//cout << actualPos[i] << " " << items[j].profit - goingCost - returnCost << " " << bestValue << " " << i <<" " << j << " " << items[j].city << endl;
-				
-				if(items[j].profit - goingCost - returnCost > bestValue){
-					bestValue = items[j].profit - goingCost - returnCost;
-					bestItem = j;
-					hasOption = true;
+					//cout << actualPos[i] << " " << items[j].profit - goingCost - returnCost << " " << bestValue << " " << i <<" " << j << " " << items[j].city << endl;
+					
+					//cerr << i << " " << j << " " << items[j].profit - goingCost - returnCost << " " << bestValue << endl;
+					if(items[j].profit - goingCost - returnCost > bestValue){
+						bestValue = items[j].profit - goingCost - returnCost;
+						bestItem = j;
+						hasOption = true;
+					}
 				}
-			}
 
-			//cout << endl;
+				//cout << endl;
 
-			if(bestItem == -1){
-				actualPos[i] = 0;
-				ended[0] = true;
-			}
-			else{
-				if(gang[i].route.empty() || gang[i].route.back().id != items[bestItem].city){
-					gang[i].route.push_back(Node());
-					gang[i].route.back().id = items[bestItem].city;
-					gang[i].route.back().capacity = 0;
+				if(bestItem == -1){
+					actualPos[i] = 0;
+					ended[0] = true;
 				}
-				gang[i].route.back().items.push_back(bestItem);
-				gang[i].route.back().capacity += items[bestItem].weight;
-				gang[i].capacity += items[bestItem].weight;
-				gangCapacity += items[bestItem].weight;
-				items[bestItem].thief = i;
-				actualPos[i] = items[bestItem].city;
-				//cerr << cost(vMax, vMin, W, R) << endl << endl;
+				else{
+					if(gang[i].route.empty() || gang[i].route.back().id != items[bestItem].city){
+						gang[i].route.push_back(Node());
+						gang[i].route.back().id = items[bestItem].city;
+						gang[i].route.back().capacity = 0;
+					}
+					gang[i].route.back().items.push_back(bestItem);
+					gang[i].route.back().capacity += items[bestItem].weight;
+					gang[i].capacity += items[bestItem].weight;
+					gangCapacity += items[bestItem].weight;
+					items[bestItem].thief = i;
+					actualPos[i] = items[bestItem].city;
+					cerr << i << " " << cost(vMax, vMin, W, R) << endl;
+				}
 			}
 		}
 	}
@@ -406,7 +411,7 @@ int main(int argc, char **argv) {
 	int numThiefs = atoi(argv[1]);
 	gang.resize(numThiefs);
 
-	greedyInitialSolution(numThiefs);
+	greedyInitialSolution(numThiefs, atoi(argv[2]), atoi(argv[3]));
 	for(int i = 0; i < numThiefs; i++)
 		fixRoute(i);
 
@@ -430,6 +435,7 @@ int main(int argc, char **argv) {
 				//s.insert(gang[i].route[j].items[k]);
 			}
 		}
+		cout << endl;
 		bool virg = false;
 		for(auto j:I){
 			if(!virg){
