@@ -327,6 +327,11 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 
 	long double v = (vMax - vMin)/W;
 
+	double bestCost = 0.0;
+	vector<Item>bestItems = items;
+	vector<Thief>bestGang = gang;
+	int bestGangCap = 0;
+
 	bool hasOption = true;
 	while(hasOption){
 		hasOption = false;
@@ -335,7 +340,7 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 				continue;
 			int availableMoves = numMoves;
 			while(availableMoves--){
-				long double bestValue = 0.0;
+				long double bestValue = -999999;
 				int bestItem = -1;
 
 				for(int j = 0; j < M; j++){
@@ -376,10 +381,22 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 					items[bestItem].thief = i;
 					actualPos[i] = items[bestItem].city;
 					cerr << i << " " << cost(vMax, vMin, W, R) << endl;
+
+					double actualCost = cost(vMax, vMin, W, R);
+					if(actualCost > bestCost){
+						bestCost = actualCost;
+						bestItems = items;
+						bestGang = gang;
+						bestGangCap = gangCapacity;
+					}
 				}
 			}
 		}
 	}
+
+	items = bestItems;
+	gang = bestGang;
+	gangCapacity = bestGangCap;
 }
 
 void joinNodes(int index, int i, int j){
