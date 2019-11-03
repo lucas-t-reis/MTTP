@@ -175,6 +175,18 @@ int closestCity(int thiefId, int cityId){
 		}
 	}
 
+	// if(bestI == 0 && cities.size() > 1){
+	// 	if(adj[cityId][1] < adj[cityId][cities.size() - 1])
+	// 		return 1;
+	// }
+	// else if(bestI == cities.size() - 1 && cities.size() > 2){
+	// 	if(adj[cityId][0] < adj[cityId][cities.size() - 2])
+	// 		return 0;
+	// }
+	// else if(cities.size() > 3){
+	// 	if(adj[cityId][bestI + 1] <  adj[cityId][bestI - 1])
+	// 		return adj[cityId][bestI + 1];
+	// }
 	return bestI;
 }
 
@@ -212,17 +224,33 @@ pair<int, Node> removeCity(int id){
 
 	auto p = make_pair(cityId, gang[id].route[cityId]);
 	
+	for(int i = 0; i < gang[id].route[cityId].items.size(); i++){
+		gangCapacity -=  items[gang[id].route[cityId].items[i]].weight;
+		gang[id].capacity -=  items[gang[id].route[cityId].items[i]].weight;
+		items[gang[id].route[cityId].items[i]].thief = -1;
+	}
+
 	gang[id].route.erase(gang[id].route.begin() + cityId);
 	
 	return p;
 }
 
 pair<int, int> removeItem(int id){
-	int cityId = rand() % (gang[id].route.size() - 1) + 1;
-	int itemId = rand() % gang[id].route[cityId].items.size();
+	int cont = 0;
+	int cityId;
+	do{
+		cityId = rand() % (gang[id].route.size() - 1) + 1;
+		cont++;
+		if(cont > 100) return make_pair(-1, -1);
+	} while(gang[id].route[cityId].items.size() <= 1);
 
-	gang[id].route[cityId].items.erase(gang[id].route[cityId].items.begin() + itemId);
+	int itemPos = rand() % gang[id].route[cityId].items.size();
+	int itemId = gang[id].route[cityId].items[itemPos];
+
+	gang[id].route[cityId].items.erase(gang[id].route[cityId].items.begin() + itemPos);
 	gang[id].route[cityId].capacity -= items[itemId].weight;
+	gang[id].capacity -= items[itemId].weight;
+	gangCapacity -= items[itemId].weight;
 	items[itemId].thief = -1;
 
 	return make_pair(cityId, itemId);
@@ -238,7 +266,7 @@ pair<int, int> addItem(int id){
 	if(cont >= 100){
 		itemId = -1;
 		for(int i = 0; i < items.size(); i++){
-			if(items[i].thief == -1){
+			if(items[i].thief == -1 && items[i].weight + gangCapacity <= W){
 				itemId = i;
 				break;
 			}
@@ -247,13 +275,14 @@ pair<int, int> addItem(int id){
 	}
 
 	gangCapacity += items[itemId].weight;
+	gang[id].capacity += items[itemId].weight;
 	items[itemId].thief = id;
 
 	for(int i = 0; i < gang[id].route.size(); i++){
 		if(items[itemId].city == gang[id].route[i].id){
 			gang[id].route[i].items.push_back(itemId);
 			gang[id].route[i].capacity += items[itemId].weight;
-			return make_pair(itemId, -1 * items[itemId].city);
+			return make_pair(itemId, -1 * i);
 		}
 	}
 
@@ -265,8 +294,6 @@ pair<int, int> addItem(int id){
 
 	return make_pair(itemId, bestPlace);
 }
-
-/**/
 
 long double cost(long double vMax, long double vMin, int W, long double R){
 
@@ -281,7 +308,7 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 	}
 	// cerr << endl;
 
-	// cerr << "Profit: " << total << endl;
+	//cerr << "Profit: " << total << endl;
 
 	long double currPenalty = 0.0;
 	long double v = (vMax - vMin)/W; // Defined in the problem description
@@ -320,6 +347,152 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 	return total;
 }
 
+bool localSearchFirst(int type, int size){
+	
+	long double bestCost = cost(vMax, vMin, W, R);
+	cerr << bestCost << endl;
+	bool isBetter = false;
+
+	/*Define a ordem de exploracao de vizinhaca dos ladroes*/
+	vector<int>stepsOrder(gang.size());
+	iota(stepsOrder.begin(), stepsOrder.end(), 0);
+	random_shuffle(stepsOrder.begin(), stepsOrder.end());
+
+	for(int i = 0; i < size; i++){
+		for(int j = 0; j < gang.size(); j++){
+			int pos = stepsOrder[j];
+			
+			if(type == 0){
+				pair<int, int> swaped = opt2(stepsOrder[j]);
+				
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					swap(gang[pos].route[swaped.first], gang[pos].route[swaped.second]);
+				}
+			}
+			else if(type == 1){
+				pair<pair<int, int>, pair<int, int>> swaped = opt4(pos);
+				pair<int, int> swaped1 = swaped.first;
+				pair<int, int> swaped2 = swaped.second;
+				
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					swap(gang[pos].route[swaped2.first], gang[pos].route[swaped2.second]);
+					swap(gang[pos].route[swaped1.first], gang[pos].route[swaped1.second]);
+				}
+			}
+			else if(type == 2){
+				pair<int, Node> removed = removeCity(pos);
+				
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					for(int k = 0; k < removed.second.items.size(); k++){
+						gangCapacity +=  items[removed.second.items[k]].weight;
+						gang[pos].capacity +=  items[removed.second.items[k]].weight;
+						items[removed.second.items[k]].thief = pos;
+					}
+					gang[pos].route.insert(gang[pos].route.begin() + removed.first, removed.second);
+				}
+			}
+			else if(type == 3){
+				pair<int, int> removed = removeItem(pos);
+				
+				if(removed.first == -1) continue;
+
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					gang[pos].route[removed.first].items.push_back(removed.second);
+					gang[pos].route[removed.first].capacity += items[removed.second].weight;
+					gangCapacity += items[removed.second].weight;
+					gang[pos].capacity += items[removed.second].weight;
+					items[removed.second].thief = pos;
+				}
+			}
+			else if(type == 4){
+				pair<int, int> added = addItem(pos);
+
+				if(added.first == -1) continue;
+
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					gangCapacity -= items[added.first].weight;
+					gang[pos].capacity -= items[added.first].weight;
+					items[added.first].thief = -1;
+
+					if(added.second < 0){
+						added.second *= -1;
+						gang[pos].route[added.second].items.pop_back();
+						gang[pos].route[added.second].capacity -= items[added.first].weight;
+					}
+					else{
+						if(added.second)
+							gang[pos].route.erase(gang[pos].route.begin() + added.second);
+						else
+							gang[pos].route.pop_back();	
+					}
+				}
+			}
+			else if(type == 5){
+				pair<int, int> removed = removeItem(pos);
+				pair<int, int> added = addItem(pos);
+
+				long double newCost = cost(vMax, vMin, W, R);
+				if(bestCost < newCost){
+					bestCost = newCost;
+					isBetter = true;
+				}
+				else{
+					if(added.first != -1){
+						gangCapacity -= items[added.first].weight;
+						gang[pos].capacity -= items[added.first].weight;
+						items[added.first].thief = -1;
+
+						if(added.second < 0){
+							added.second *= -1;
+							gang[pos].route[added.second].items.pop_back();
+							gang[pos].route[added.second].capacity -= items[added.first].weight;
+						}
+						else{
+							if(added.second)
+								gang[pos].route.erase(gang[pos].route.begin() + added.second);
+							else
+								gang[pos].route.pop_back();	
+						}	
+					}
+					if(removed.first != -1){
+						gang[pos].route[removed.first].items.push_back(removed.second);
+						gang[pos].route[removed.first].capacity += items[removed.second].weight;
+						gangCapacity += items[removed.second].weight;
+						gang[pos].capacity += items[removed.second].weight;
+						items[removed.second].thief = pos;
+					}
+				}
+			}
+		}
+	}
+	return isBetter;
+}
+
 void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 
 	vector<int>actualPos(numThiefs, 0);
@@ -340,7 +513,7 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 				continue;
 			int availableMoves = numMoves;
 			while(availableMoves--){
-				long double bestValue = -999999;
+				long double bestValue = numeric_limits<long double>::lowest();
 				int bestItem = -1;
 
 				for(int j = 0; j < M; j++){
@@ -356,9 +529,9 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 					
 					//cerr << i << " " << j << " " << items[j].profit - goingCost - returnCost << " " << bestValue << endl;
 					if(items[j].profit - goingCost - returnCost > bestValue){
-						bestValue = items[j].profit - goingCost - returnCost;
-						bestItem = j;
-						hasOption = true;
+							bestValue = items[j].profit - goingCost - returnCost;
+							bestItem = j;
+							hasOption = true;
 					}
 				}
 
@@ -380,7 +553,7 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1){
 					gangCapacity += items[bestItem].weight;
 					items[bestItem].thief = i;
 					actualPos[i] = items[bestItem].city;
-					cerr << i << " " << cost(vMax, vMin, W, R) << endl;
+					//cerr << i << " " << cost(vMax, vMin, W, R) << endl;
 
 					double actualCost = cost(vMax, vMin, W, R);
 					if(actualCost > bestCost){
@@ -411,7 +584,7 @@ void fixRoute(int index){
 	for(int i = 0; i < gang[index].route.size(); i++){
 		for(int j = i + 1; j < gang[index].route.size(); j++){
 			if(gang[index].route[i].id == gang[index].route[j].id ){
-				cerr << "Fixed: " << i << " " << j << " " << gang[index].route[j].id << endl;
+				//cerr << "Fixed: " << i << " " << j << " " << gang[index].route[j].id << endl;
 				joinNodes(index, i, j);
 				i--;
 				j--;
@@ -431,6 +604,11 @@ int main(int argc, char **argv) {
 	greedyInitialSolution(numThiefs, atoi(argv[2]), atoi(argv[3]));
 	for(int i = 0; i < numThiefs; i++)
 		fixRoute(i);
+
+	for(int i = 0; i < 5; i++){
+		localSearchFirst(i, 10000);
+		cerr << i << " " << cost(vMax, vMin, W, R) << " " << gangCapacity << endl;
+	}
 
 	// for(int i = 0; i < numThiefs; i++){
 	// 	for(auto j:gang[i].route){
