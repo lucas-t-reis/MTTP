@@ -322,7 +322,7 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 	long double currPenalty = 0.0;
 	long double v = (vMax - vMin)/W; // Defined in the problem description
 		
-	#pragma omp for
+	#pragma omp parallel for
 	for( int i=0; i < gang.size(); i++){
 
 		 int capacity = 0;
@@ -684,7 +684,9 @@ void removeItem(int id, int cityId, int itemPos){
 
 }
 
-void perturb(int factor) {
+void perturb(double factor) {
+        
+    if(factor >= 0.4) factor = 0.5;
 
     for(int i=0; i<gang.size(); i++){
         
@@ -693,7 +695,7 @@ void perturb(int factor) {
             int totalStolen = 0;
             for(int k=0; k<gang[i].route.size(); k++) totalStolen += gang[i].route[k].items.size();
                 
-            totalStolen /= 3;
+            totalStolen = (int) ((0.40+factor) * totalStolen);
 
             while(totalStolen--) {
             
@@ -711,25 +713,32 @@ void perturb(int factor) {
     }
 }
 
-void ILS(int numThiefs, bool safe = false, int numMoves = 1, int size = 300, int iter = 500) {
+void ILS(int numThiefs, bool safe = false, int numMoves = 1, int size = 100, int iter = 300) {
     
-
+    
 	vector<Item> bestItem;
 	vector<Thief> bestGang;
 	int bestGangCap = 0;
 	long double bestCost = numeric_limits<long double>::lowest();
 	greedyInitialSolution(numThiefs, safe, numMoves, 0);
-    int factor = 1;
+    double factor = 0;
+    int ct = 0;
+    bool improved = false;
     while(iter--) {
-    
+        
+        ct++;
         //cerr << iter+1 << " " << cost(vMax, vMin, W, R) << " "; 
         perturb(factor); // Factor is a dummy for a while, later on it can influence the level of perturbation
         //cerr << cost(vMax, vMin, W,R) << " "; 
         VND(size);
         long double actualCost = cost(vMax, vMin, W, R);
         //cerr << actualCost << endl; 
-
+        if(ct >= 50 && !improved) {
+            factor+=0.05;
+        }
         if( actualCost  > bestCost ) {
+            improved = true;
+            ct = 0;
             bestItem = items;
             bestGang = gang;
             bestGangCap = gangCapacity;
@@ -743,28 +752,63 @@ void ILS(int numThiefs, bool safe = false, int numMoves = 1, int size = 300, int
 }
 
 void printResults(int numThiefs, bool safe, int numMoves, int randomChance, int size, int iter, const string &hName, chrono::duration<double> time) {
-		cerr << numThiefs << " " <<  safe  << " " << numMoves << " " << randomChance << " " 
-		<< size << " " << iter << " " << time.count() << " " << fixed << setprecision(2) << cost(vMax, vMin, W, R) << endl;
+		long double value = cost(vMax, vMin, W, R);
+        cout << numThiefs << " " << numMoves << " " << size << " " <<  fixed << setprecision(2) << value << endl;
+        
+        cerr << name << " knapsack " << W << " items " <<  M << endl;
+        cerr << "Value " << value << endl;
+        for(int i = 0; i < gang.size(); i++){
+		vector<int>I;
+		int cap = 0;
+		for(int j = 1; j < gang[i].route.size(); j++){
+			if(j != gang[i].route.size() - 1)
+				cerr << gang[i].route[j].id + 1 << ",";
+			else
+				cerr << gang[i].route[j].id + 1;
+			for(int k = 0; k < gang[i].route[j].items.size(); k++){
+				I.push_back(gang[i].route[j].items[k]);
+				//s.insert(gang[i].route[j].items[k]);
+			}
+		}
+		cerr << endl;
+		bool virg = false;
+		for(auto j:I){
+			if(!virg){
+				cerr << j + 1;
+				virg = true;
+			}
+			else{
+				cerr << "," << j + 1;
+			}
+		}
+		cerr << endl;
+	}
+
+    cerr << "---------------------------------" << endl;
 }
 
 void debugMode() {
 	
 	
     for(int i=1; i<=5; i++) // for each thief
-        for(int j=0; j<=1; j++) // using camisinha or not
-            for(int k=1; k<=5; k++) // taking up to k steps
-                //for(int l=0; l<=100; l+=5) // with a random chance of
-                    for(int m=100; m<=500; m+=100)   // with a neighborhood size of
-                        for(int n=100; n<=500; n+=100) // with this given iteration
+        //for(int j=0; j<=1; j++) // using camisinha or not
+            //for(int k=1; k<=5; k++) // taking up to k steps
+                    for(int m=100; m<=300; m+=100)   // with a neighborhood size of
+                        //for(int n=100; n<=500; n+=100) // with this given iteration
                         {
 							
                             gang.resize(i);
 							auto start = std::chrono::steady_clock::now();
-                            ILS(i,j,k,m,n);
-							auto end = std::chrono::steady_clock::now();
+                            
+                            ILS(i,false,3,m,300);
+							
+                            auto end = std::chrono::steady_clock::now();
 							std::chrono::duration<double> diff = end-start;
-                            printResults(i,j,k,0,m,n,"ILS", diff);
+                            
+                            printResults(i,false,3,0,m,300,name, diff);
+                            
                             gang.clear();
+                            
                             for(int z=0; z<items.size(); z++) {items[z].thief = -1;}
                             
                         }
@@ -777,7 +821,7 @@ int main(int argc, char **argv) {
 	
     srand(time(NULL));
 	readInstance(name, type, V, M, W, vMin, vMax, R);
-	
+    
     int numThiefs = atoi(argv[1]);
 	bool safe = atoi(argv[2]);
 	int numMoves = atoi(argv[3]);
@@ -787,42 +831,9 @@ int main(int argc, char **argv) {
 	
 	
     
-    if(numThiefs == -1) {
-    
+    if(numMoves == -1) {
+
         debugMode();    
     }
-
-    //Tem que descomentar a linha abaixo se nao for debugar
-    //gang.resize(numThiefs);
-	//GRASP(numThiefs, safe, numMoves, randomChance, size, iter);	
-    //ILS(numThiefs, safe, numMoves, size, iter);
-
-	cout << "Value " << cost(vMax, vMin, W, R) << endl;
-	for(int i = 0; i < gang.size(); i++){
-		vector<int>I;
-		int cap = 0;
-		for(int j = 1; j < gang[i].route.size(); j++){
-			if(j != gang[i].route.size() - 1)
-				cout << gang[i].route[j].id + 1 << ",";
-			else
-				cout << gang[i].route[j].id + 1;
-			for(int k = 0; k < gang[i].route[j].items.size(); k++){
-				I.push_back(gang[i].route[j].items[k]);
-				//s.insert(gang[i].route[j].items[k]);
-			}
-		}
-		cout << endl;
-		bool virg = false;
-		for(auto j:I){
-			if(!virg){
-				cout << j + 1;
-				virg = true;
-			}
-			else{
-				cout << "," << j + 1;
-			}
-		}
-		cout << endl;
-	}
 
 }
