@@ -727,22 +727,24 @@ void ILS(int numThiefs, bool safe = false, int numMoves = 1, int size = 100, int
     while(iter--) {
         
         ct++;
+        improved = false;
         //cerr << iter+1 << " " << cost(vMax, vMin, W, R) << " "; 
         perturb(factor); // Factor is a dummy for a while, later on it can influence the level of perturbation
         //cerr << cost(vMax, vMin, W,R) << " "; 
         VND(size);
         long double actualCost = cost(vMax, vMin, W, R);
         //cerr << actualCost << endl; 
-        if(ct >= 50 && !improved) {
-            factor+=0.05;
-        }
         if( actualCost  > bestCost ) {
             improved = true;
+            factor = 0;
             ct = 0;
             bestItem = items;
             bestGang = gang;
             bestGangCap = gangCapacity;
             bestCost = actualCost;
+        }
+        if(ct >= 50 && !improved) {
+            factor+=0.05;
         }
     }    
 
