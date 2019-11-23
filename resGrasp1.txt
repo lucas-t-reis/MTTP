@@ -1,0 +1,120 @@
+a280-TTP_2790_ bounded strongly corr 1: 	578868.30
+a280-TTP_2790_ bounded strongly corr 2: 	634138.88
+a280-TTP_2790_ bounded strongly corr 3: 	613330.61
+a280-TTP_2790_ bounded strongly corr 4: 	599827.36
+a280-TTP_2790_ bounded strongly corr 5: 	591213.13
+a280-TTP_2790_ bounded strongly corr 1: 	855268.14
+a280-TTP_2790_ bounded strongly corr 2: 	1173078.24
+a280-TTP_2790_ bounded strongly corr 3: 	1128850.23
+a280-TTP_2790_ bounded strongly corr 4: 	1094428.47
+a280-TTP_2790_ bounded strongly corr 5: 	1009003.43
+a280-TTP_2790_ uncorrelated 1: 	172962.72
+a280-TTP_2790_ uncorrelated 2: 	253036.33
+a280-TTP_2790_ uncorrelated 3: 	227458.87
+a280-TTP_2790_ uncorrelated 4: 	194877.46
+a280-TTP_2790_ uncorrelated 5: 	167831.27
+a280-TTP_2790_ uncorrelated 1: 	297441.82
+a280-TTP_2790_ uncorrelated 2: 	446026.50
+a280-TTP_2790_ uncorrelated 3: 	409979.56
+a280-TTP_2790_ uncorrelated 4: 	382887.71
+a280-TTP_2790_ uncorrelated 5: 	279324.45
+a280-TTP_2790_ uncorrelated, similar weights 1: 	221119.46
+a280-TTP_2790_ uncorrelated, similar weights 2: 	281980.17
+a280-TTP_2790_ uncorrelated, similar weights 3: 	257038.35
+a280-TTP_2790_ uncorrelated, similar weights 4: 	243426.49
+a280-TTP_2790_ uncorrelated, similar weights 5: 	230940.06
+a280-TTP_2790_ uncorrelated, similar weights 1: 	292886.27
+a280-TTP_2790_ uncorrelated, similar weights 2: 	405490.25
+a280-TTP_2790_ uncorrelated, similar weights 3: 	400232.21
+a280-TTP_2790_ uncorrelated, similar weights 4: 	342150.81
+a280-TTP_2790_ uncorrelated, similar weights 5: 	290037.72
+a280-TTP_837_ bounded strongly corr 1: 	178243.01
+a280-TTP_837_ bounded strongly corr 2: 	193440.27
+a280-TTP_837_ bounded strongly corr 3: 	186051.48
+a280-TTP_837_ bounded strongly corr 4: 	175085.26
+a280-TTP_837_ bounded strongly corr 5: 	170956.84
+a280-TTP_837_ bounded strongly corr 1: 	255786.73
+a280-TTP_837_ bounded strongly corr 2: 	322543.40
+a280-TTP_837_ bounded strongly corr 3: 	311296.59
+a280-TTP_837_ bounded strongly corr 4: 	313472.97
+a280-TTP_837_ bounded strongly corr 5: 	283727.89
+a280-TTP_837_ uncorrelated 1: 	76099.18
+a280-TTP_837_ uncorrelated 2: 	103647.08
+a280-TTP_837_ uncorrelated 3: 	104435.03
+a280-TTP_837_ uncorrelated 4: 	98782.57
+a280-TTP_837_ uncorrelated 5: 	87892.86
+a280-TTP_837_ uncorrelated 1: 	108637.68
+a280-TTP_837_ uncorrelated 2: 	145619.54
+a280-TTP_837_ uncorrelated 3: 	135489.71
+a280-TTP_837_ uncorrelated 4: 	129520.14
+a280-TTP_837_ uncorrelated 5: 	109276.34
+a280-TTP_837_ uncorrelated, similar weights 1: 	82423.32
+a280-TTP_837_ uncorrelated, similar weights 2: 	104712.44
+a280-TTP_837_ uncorrelated, similar weights 3: 	106400.66
+a280-TTP_837_ uncorrelated, similar weights 4: 	98649.87
+a280-TTP_837_ uncorrelated, similar weights 5: 	93237.65
+a280-TTP_837_ uncorrelated, similar weights 1: 	98576.56
+a280-TTP_837_ uncorrelated, similar weights 2: 	148970.85
+a280-TTP_837_ uncorrelated, similar weights 3: 	148250.13
+a280-TTP_837_ uncorrelated, similar weights 4: 	130646.58
+a280-TTP_837_ uncorrelated, similar weights 5: 	113771.19
+berlin52-TTP_153_ bounded strongly corr 1: 	38110.20
+berlin52-TTP_153_ bounded strongly corr 2: 	36029.15
+berlin52-TTP_153_ bounded strongly corr 3: 	34272.22
+berlin52-TTP_153_ bounded strongly corr 4: 	33912.10
+berlin52-TTP_153_ bounded strongly corr 5: 	32882.90
+berlin52-TTP_153_ bounded strongly corr 1: 	71285.71
+berlin52-TTP_153_ bounded strongly corr 2: 	76875.91
+berlin52-TTP_153_ bounded strongly corr 3: 	76812.94
+berlin52-TTP_153_ bounded strongly corr 4: 	74666.97
+berlin52-TTP_153_ bounded strongly corr 5: 	73062.05
+berlin52-TTP_153_ uncorrelated 1: 	22481.31
+berlin52-TTP_153_ uncorrelated 2: 	24608.99
+berlin52-TTP_153_ uncorrelated 3: 	24016.17
+berlin52-TTP_153_ uncorrelated 4: 	23371.46
+berlin52-TTP_153_ uncorrelated 5: 	23057.26
+berlin52-TTP_153_ uncorrelated 1: 	24886.98
+berlin52-TTP_153_ uncorrelated 2: 	31191.23
+berlin52-TTP_153_ uncorrelated 3: 	29965.39
+berlin52-TTP_153_ uncorrelated 4: 	30810.92
+berlin52-TTP_153_ uncorrelated 5: 	28659.66
+berlin52-TTP_153_ uncorrelated, similar weights 1: 	22132.40
+berlin52-TTP_153_ uncorrelated, similar weights 2: 	24710.84
+berlin52-TTP_153_ uncorrelated, similar weights 3: 	24001.02
+berlin52-TTP_153_ uncorrelated, similar weights 4: 	24075.42
+berlin52-TTP_153_ uncorrelated, similar weights 5: 	23248.96
+berlin52-TTP_153_ uncorrelated, similar weights 1: 	27089.57
+berlin52-TTP_153_ uncorrelated, similar weights 2: 	33287.84
+berlin52-TTP_153_ uncorrelated, similar weights 3: 	34413.28
+berlin52-TTP_153_ uncorrelated, similar weights 4: 	33363.72
+berlin52-TTP_153_ uncorrelated, similar weights 5: 	32366.62
+berlin52-TTP_510_ bounded strongly corr 1: 	135392.62
+berlin52-TTP_510_ bounded strongly corr 2: 	138150.17
+berlin52-TTP_510_ bounded strongly corr 3: 	133205.45
+berlin52-TTP_510_ bounded strongly corr 4: 	127332.07
+berlin52-TTP_510_ bounded strongly corr 5: 	122265.51
+berlin52-TTP_510_ bounded strongly corr 1: 	240728.22
+berlin52-TTP_510_ bounded strongly corr 2: 	285977.27
+berlin52-TTP_510_ bounded strongly corr 3: 	287875.91
+berlin52-TTP_510_ bounded strongly corr 4: 	289259.97
+berlin52-TTP_510_ bounded strongly corr 5: 	277733.34
+berlin52-TTP_510_ uncorrelated 1: 	61566.49
+berlin52-TTP_510_ uncorrelated 2: 	72738.16
+berlin52-TTP_510_ uncorrelated 3: 	75112.90
+berlin52-TTP_510_ uncorrelated 4: 	69505.72
+berlin52-TTP_510_ uncorrelated 5: 	68197.23
+berlin52-TTP_510_ uncorrelated 1: 	80265.72
+berlin52-TTP_510_ uncorrelated 2: 	100508.42
+berlin52-TTP_510_ uncorrelated 3: 	103664.26
+berlin52-TTP_510_ uncorrelated 4: 	104212.04
+berlin52-TTP_510_ uncorrelated 5: 	104579.07
+berlin52-TTP_510_ uncorrelated, similar weights 1: 	71067.36
+berlin52-TTP_510_ uncorrelated, similar weights 2: 	80355.71
+berlin52-TTP_510_ uncorrelated, similar weights 3: 	79494.22
+berlin52-TTP_510_ uncorrelated, similar weights 4: 	78846.63
+berlin52-TTP_510_ uncorrelated, similar weights 5: 	77841.39
+berlin52-TTP_510_ uncorrelated, similar weights 1: 	88378.12
+berlin52-TTP_510_ uncorrelated, similar weights 2: 	105198.93
+berlin52-TTP_510_ uncorrelated, similar weights 3: 	101743.88
+berlin52-TTP_510_ uncorrelated, similar weights 4: 	102053.84
+berlin52-TTP_510_ uncorrelated, similar weights 5: 	98906.34
