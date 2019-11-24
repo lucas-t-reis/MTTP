@@ -49,6 +49,12 @@ string name, type;
 int V, M, W;
 long double vMin, vMax, R;
 
+chrono::time_point<chrono::system_clock> start;
+
+bool timeLimit(long double maxSeconds){
+	return chrono::duration_cast<std::chrono::seconds>(chrono::system_clock::now() - start).count() > maxSeconds;
+}
+
 
 int dist(int a, int b){
 	return ceil(sqrt((cities[a].x - cities[b].x) * (cities[a].x - cities[b].x) + (cities[a].y - cities[b].y) * (cities[a].y - cities[b].y))); 
@@ -306,17 +312,6 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 
 
 	long double total = 0.0;
-	// Start from city 1 because a true thief never steals from home
-	for(int i = 0; i < items.size(); i++){
-		if(items[i].thief != -1){ 
-			total += items[i].profit;
-			//cerr << i << " ";
-		}
-	}
-	// cerr << endl;
-
-	//cerr << "Profit: " << total << endl;
-
 	long double currPenalty = 0.0;
 	long double v = (vMax - vMin)/W; // Defined in the problem description
 	
@@ -333,31 +328,26 @@ long double cost(long double vMax, long double vMin, int W, long double R){
 
 			int a = gang[i].route[j].id;
 			int b = gang[i].route[j + 1].id;
+
+			for(int k = 0; k < gang[i].route[j + 1].items.size(); k++)
+				total += items[gang[i].route[j + 1].items[k]].profit;
 			
-			//cerr << adj[a][b]/(vMax - v * capacity) << endl;
 			currPenalty += adj[a][b]/(vMax - v * capacity);
-			//cerr << i << " " << adj[a][b]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
 		}
 
 		// Coming back home
 		capacity += end.capacity;
 		currPenalty += adj[end.id][first.id]/(vMax - v * capacity);
-		//cerr << i << " " << adj[end.id][first.id]/(vMax - v * capacity) << " " << (vMax - v * capacity) << endl;
-		//cerr << endl;
-		//cerr << adj[end.id][first.id]/(vMax - v * capacity) << endl;
 	}
 
 	total -= R * currPenalty;
 
-	//cerr << "Penalty: " << R * currPenalty << endl;
-	
 	return total;
 }
 
 bool localSearchFirst(int type, int size){
 	
 	long double bestCost = cost(vMax, vMin, W, R);
-	//cerr << bestCost << endl;
 	bool isBetter = false;
 
 	for(int i = 0; i < size; i++){
@@ -510,8 +500,7 @@ bool localSearchFirst(int type, int size){
 bool VND(int size){
 	bool isBetter = false; //Indica se melhorou ou nao
 	int i = 0; //Inicia na vizinhanca 0 (opt2)
-	while(i <= 5){
-		//cerr << i << endl;
+	while(i <= 5 && !timeLimit(600)){
 		//Faz size iterações naquela vizinhança
 		if(localSearchFirst(i, size)){
 			i = 0; //Se melhorou, volta para o início
@@ -548,7 +537,6 @@ void fixRoute(int index){
 	for(int i = 0; i < gang[index].route.size(); i++){
 		for(int j = i + 1; j < gang[index].route.size(); j++){
 			if(gang[index].route[i].id == gang[index].route[j].id ){
-				//cerr << "Fixed: " << i << " " << j << " " << gang[index].route[j].id << endl;
 				joinNodes(index, i, j);
 				i--;
 				j--;
@@ -591,17 +579,12 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1, i
 					
 					if(!safe) returnCost = 0;
 
-					//cout << actualPos[i] << " " << items[j].profit - goingCost - returnCost << " " << bestValue << " " << i <<" " << j << " " << items[j].city << endl;
-					
-					//cerr << i << " " << j << " " << items[j].profit - goingCost - returnCost << " " << bestValue << endl;
 					if(items[j].profit - goingCost - returnCost > bestValue && rand() % 100 >= randomChance){
 							bestValue = items[j].profit - goingCost - returnCost;
 							bestItem = j;
 							hasOption = true;
 					}
 				}
-
-				//cout << endl;
 
 				if(bestItem == -1){
 					actualPos[i] = 0;
@@ -619,8 +602,7 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1, i
 					gangCapacity += items[bestItem].weight;
 					items[bestItem].thief = i;
 					actualPos[i] = items[bestItem].city;
-					//cerr << i << " " << cost(vMax, vMin, W, R) << endl;
-
+				
 					double actualCost = cost(vMax, vMin, W, R);
 					if(actualCost > bestCost){
 						bestCost = actualCost;
@@ -642,16 +624,17 @@ void greedyInitialSolution(int numThiefs, bool safe = false, int numMoves = 1, i
 }
 
 void GRASP(int numThiefs, bool safe = false, int numMoves = 1, int randomChance = 0, int size = 300, int iter = 500){
+	
+	start = chrono::system_clock::now();
+
 	vector<Item> bestItem;
 	vector<Thief> bestGang;
 	int bestGangCap;
 	long double bestCost = numeric_limits<long double>::lowest();
 
-	while(iter--){
+	while(iter-- && !timeLimit(600)){
 		greedyInitialSolution(numThiefs, safe, numMoves, randomChance);
-		cerr << iter << " " << cost(vMax, vMin, W, R) << " ";
 		VND(size);
-		cerr << cost(vMax, vMin, W, R) << endl;
 		long double newCost = cost(vMax, vMin, W, R);
 		if(newCost > bestCost){
 			bestItem = items;
@@ -718,13 +701,10 @@ void ILS(int numThiefs, bool safe = false, int numMoves = 1, int size = 300, int
     int factor = 1;
     while(iter--) {
     
-        //cerr << iter+1 << " " << cost(vMax, vMin, W, R) << " "; 
         perturb(factor); // Factor is a dummy for a while, later on it can influence the level of perturbation
-        //cerr << cost(vMax, vMin, W,R) << " "; 
         VND(size);
         long double actualCost = cost(vMax, vMin, W, R);
-        //cerr << actualCost << endl; 
-
+        
         if( actualCost  > bestCost ) {
             bestItem = items;
             bestGang = gang;
@@ -750,58 +730,47 @@ int main(int argc, char **argv) {
 	int size = atoi(argv[5]);
 	int iter = atoi(argv[6]);
 	
-	gang.resize(numThiefs);
-
-
-    ILS(numThiefs, safe, numMoves, size, iter);
-	//GRASP(numThiefs, safe, numMoves, randomChance, size, iter);
-
-	// greedyInitialSolution(numThiefs, atoi(argv[2]), atoi(argv[3]));
-	// VND(argv[5]);
+	type.pop_back();
 	
+	for(numThiefs = 1; numThiefs <= 5; numThiefs++){
+		gang.resize(numThiefs);
 
-	// for(int i = 0; i < numThiefs; i++){
-	// 	for(auto j:gang[i].route){
-	// 		cout << j.id << " ";
-	// 	}
-	// 	cout << endl;
-	// }
+		GRASP(numThiefs, safe, numMoves, randomChance, size, iter);
 
-	for(int i = 0; i < gang.size(); i++){
-		vector<int>I;
-		int cap = 0;
-		for(int j = 1; j < gang[i].route.size(); j++){
-			if(j != gang[i].route.size() - 1)
-				cout << gang[i].route[j].id + 1 << ",";
-			else
-				cout << gang[i].route[j].id + 1;
-			for(int k = 0; k < gang[i].route[j].items.size(); k++){
-				I.push_back(gang[i].route[j].items[k]);
-				//s.insert(gang[i].route[j].items[k]);
+		/**Valor**/
+		cerr << name << "_" << M << "_" << type << " " << numThiefs << ": " << "\t" << fixed << setprecision(2) << cost(vMax, vMin, W, R) << "\n";
+		/****/
+
+		/**Solução**/	
+		cout << name << "_" << M << "_" << type << ":\n";
+		for(int i = 0; i < gang.size(); i++){
+			vector<int>I;
+			int cap = 0;
+			for(int j = 1; j < gang[i].route.size(); j++){
+				if(j != gang[i].route.size() - 1)
+					cout << gang[i].route[j].id + 1 << ",";
+				else
+					cout << gang[i].route[j].id + 1;
+				for(int k = 0; k < gang[i].route[j].items.size(); k++){
+					I.push_back(gang[i].route[j].items[k]);
+				}
 			}
+			cout << endl;
+			bool virg = false;
+			for(auto j:I){
+				if(!virg){
+					cout << j + 1;
+					virg = true;
+				}
+				else{
+					cout << "," << j + 1;
+				}
+			}
+			cout << endl;
 		}
 		cout << endl;
-		bool virg = false;
-		for(auto j:I){
-			if(!virg){
-				cout << j + 1;
-				virg = true;
-			}
-			else{
-				cout << "," << j + 1;
-			}
-		}
-		cout << endl;
+		/****/
+
+		clearSolution();
 	}
-
-	// for(auto i:s){
-	// 	cerr << i << " ";
-	// }
-	// cerr << endl;
-    cerr << name << endl;
-	cerr << "Value: " << fixed << setprecision(2) << cost(vMax, vMin, W, R) << endl;
-	cerr << "Weight: " << gangCapacity << " Max Capacity: " << W << endl;
-	cerr << "Parameters: ";
-	cerr << "nThiefs " << numThiefs << " safe " << safe << " nMoves " << numMoves << " %rand " << randomChance << " neighborhood size " << size << " iterations " << iter << endl;
-
 }

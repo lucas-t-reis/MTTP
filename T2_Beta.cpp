@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <chrono>
-#include<omp.h>
+#include <omp.h>
 using namespace std;
 
 
