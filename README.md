@@ -1,11 +1,11 @@
 # Compiling & Running
 The parameters used are:
-**1** - Metaheuristic to be used [GRASP, ILS]
-**2** - # of thieves [1,2,3,4,5]
-**3** - safe or not [0,1] - means considering or not the cost of going back with current weight
-**4** - # of moves each thief has
-**5** - VND neighborhood size [1 ~ 1000]
-**6** - # of iterations in each neighborhood [1 ~ 1000]
+**1** - Metaheuristic to be used [GRASP, ILS]\
+**2** - # of thieves [1,2,3,4,5]\
+**3** - safe or not [0,1] - means considering or not the cost of going back with current weight\
+**4** - # of moves each thief has\
+**5** - VND neighborhood size [1 ~ 1000]\
+**6** - # of iterations in each neighborhood [1 ~ 1000]\
 **7** - Random factor to be used
 
 ```bash
