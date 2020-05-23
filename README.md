@@ -9,8 +9,8 @@ The parameters used are:
 **7** - Random factor to be used
 
 ```bash
-$ g++ -std=c++11 -O3 MTTP.cpp -o MTTP
-$ ./MTTP GRASP 2 0 2 100 100 20 < path/to/input
+~$ g++ -std=c++11 -O3 MTTP.cpp -o MTTP
+~$ ./MTTP GRASP 2 0 2 100 100 20 < path/to/input
 ```
 
 The output consists of the route taken in one line, followed by the items taken in the next line. That is repeated for each thief
