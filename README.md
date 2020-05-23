@@ -1,5 +1,5 @@
 # Multiple Traveling Thieves Problem - MTTP
-Proposed by Chand and Wagner<sup>1</sup> and based on the Traveling Thief Problem (TTP) by Bonyad,Michalewicz and Barone<sup>2</sup>, the MTTP is a combination of the Knapsack problem and the Traveling Salesman Problem. 
+Proposed by Chand and Wagner<sup>1</sup> and based on the Traveling Thief Problem (TTP) by Bonyad,Michalewicz and Barone<sup>2</sup>, the MTTP is a combination of the Knapsack problem and the Traveling Salesman Problem (TSP). 
 Initially you are given a set of cities, each containing items with a certain value and weight. Additionaly, you begin the problem with a number **t** of Thieves. The goal of the Thieves is to maximize profit by stealing items from the cities while minimizing the penalty, which in this problem is a 'fee' paid to use the backpack which stores the items - that is the tricky part, since each item stolen reduces your traveling speed, so you must choose wisely the citiy order and items to steal. To achieve that goal, they must never exceed the groups weight carrying limit. 
 
 ## Example
@@ -9,7 +9,7 @@ In the figure below, each city - except the first one - has a set of items with 
 <img src="https://raw.githubusercontent.com/lucas-t-reis/MTTP/master/assets/sample.svg">
 </p>
 
-In this case, considering 1 thief for simplicity sake, the thief travels without stealing items from city *1* to city *2* and after that goes to city *4* and *3*. This part of the route has a time cost of 5 + 6 + 4 = 15. In city *3*  it takes the first two items, making a profit of 80. After that it travels back to the orgin, again with the cost of 15 - and in that part of the heist he travels back with a velocity of 0.4, because of the weight of the items in the backpack. Therefore we have **Z**([1,2,4,3], [40,40]) = 80 -1\*(5+6+4+15) = 50.
+In this case, considering 1 thief for simplicity sake, the thief travels without stealing items from city *1* to city *2* and after that goes to city *4* and *3*. This part of the route has a time cost of 5 + 6 + 4 = 15. In city *3*  it takes the first two items, making a profit of 80. After that it travels back to the orgin, again with the cost of 15 - and in that part of the heist he travels back with a velocity of 0.4, because of the weight of the items in the backpack. Therefore we have **Z**([1,2,4,3], [40,40]) = 80 -1\*(5+6+4+15) = 50. Note that the solution isn't the knapsack optimum, which is to take the item with value 100 from city 3, nor the TSP solution - visit 1,2,3,4. It is a combination of those independent problems, hence the complex nature of the task at hand.
 
 
 ## Problem definition
