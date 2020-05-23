@@ -1,3 +1,19 @@
+# Compiling & Running
+The parameters used are:
+**1** - Metaheuristic to be used [GRASP, ILS]
+**2** - # of thieves [1,2,3,4,5]
+**3** - safe or not [0,1] - means considering or not the cost of going back with current weight
+**4** - # of moves each thief has
+**5** - VND neighborhood size [1 ~ 1000]
+**6** - # of iterations in each neighborhood [1 ~ 1000]
+**7** - Random factor to be used
+
+```bash
+$ g++ -std=c++11 -O3 MTTP.cpp -o MTTP
+$ ./MTTP GRASP 2 0 2 100 100 20 < path/to/input
+```
+
+The output consists of the route taken in one line, followed by the items taken in the next line. That is repeated for each thief
 # Multiple Traveling Thieves Problem - MTTP
 Proposed by Chand and Wagner<sup>1</sup> and based on the Traveling Thief Problem (TTP) by Bonyad,Michalewicz and Barone<sup>2</sup>, the MTTP is a combination of the Knapsack problem and the Traveling Salesman Problem (TSP). 
 Initially you are given a set of cities, each containing items with a certain value and weight. Additionaly, you begin the problem with a number **t** of Thieves. The goal of the Thieves is to maximize profit by stealing items from the cities while minimizing the penalty, which in this problem is a 'fee' paid to use the backpack which stores the items - that is the tricky part, since each item stolen reduces your traveling speed, so you must choose wisely the citiy order and items to steal. To achieve that goal, they must never exceed the groups weight carrying limit. 

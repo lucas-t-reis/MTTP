@@ -6,7 +6,7 @@ using namespace std;
 int main(int argc, char **argv) {
 
 	srand(time(NULL));
-	//	./a.out G 1-5 0/1 1-5 ??? ??? 0-100 < data
+	
 	// Reading problem data and Input parameters
 	readInstance(name, type, V, M, W, vMin, vMax, R);
 
@@ -28,6 +28,7 @@ int main(int argc, char **argv) {
 		cerr << "Invalid option. You provided " << heuristic << " and the valid options are g/G or i/I\n";
 		exit(EXIT_FAILURE);
 	}
-	printSolution()
+
+	printSolution();
 	
 }

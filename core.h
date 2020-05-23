@@ -279,7 +279,7 @@ void printSolution() {
 
 	std::cout << name << "_" << M << "_" << type << ":\n";
 	for(int i = 0; i < gang.size(); i++){
-		vector<int>I;
+		std::vector<int>I;
 		int cap = 0;
 		for(int j = 1; j < gang[i].route.size(); j++){
 			if(j != gang[i].route.size() - 1)
