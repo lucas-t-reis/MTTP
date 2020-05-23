@@ -16,9 +16,9 @@ In this case, considering 1 thief for simplicity sake, the thief travels without
 * **N** = {1,2,....,n} is the set of cities
 * d<sub>ij</sub> is the distance from city *i* to city *j*
 * **M**<sub>i</sub> = {1,.....,m<sub>i</sub>} is the set of items of city i
-* Each item *k* at city *i* gives a profit *p*<sub>ik</sub> and a weight <sub>ik</sub> associated to it
+* Each item *k* at city *i* gives a profit *p*<sub>ik</sub> and a weight w<sub>ik</sub> associated to it
 * The speed of each thief varies according to the number of items it's carrying
-* y<sub>ik</sub> is 1 if item k was taken from city i and 0 otherwise
+* y<sub>ik</sub> is 1 if item *k* was taken from city *i* and 0 otherwise
 * The maximum capacity of the gang is denoted **W**
 * The weight carried by a thief leaving city i is denoted W<sub>i</sub>
 * The constant v is defined as being v = (V<sub>max</sub> - V<sub>min</sub>)/**W**
