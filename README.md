@@ -56,3 +56,7 @@ In this case, considering 1 thief for simplicity sake, the thief travels without
 
 **1** - S. Chand, M. Wagner. Fast Heuristics for the Multiple Traveling Thieves Problem. Proceedings of GECCO’16, pp. 293–300, 2016.\
 **2** - M. R. Bonyadi, Z. Michalewicz, L. Barone. The travelling thief problem: the first step in the transition from theoretical problems to realistic problems. Proceedings of CEC’13, pp. 1037–1044, 2013.
+
+## Project authors
+* [Matheus Aguilar](https://github.com/Matheus-Aguilar) 
+* [Lucas Reis](https://github.com/lucas-t-reis)
