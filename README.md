@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="https://freesvg.org/img/burglar.png" width="128" height="128">
+</p>
+<h1 align="center">MTTP</h1>
+<p align="center">
+  <img src="https://img.shields.io/github/last-commit/lucas-t-reis/MTTP">
+  <img src="https://img.shields.io/github/repo-size/lucas-t-reis/MTTP">
+</p>
+
+
+
 # Compiling & Running
 The parameters used are:\
 \
@@ -60,3 +71,6 @@ In this case, considering 1 thief for simplicity sake, the thief travels without
 ## Project authors
 * [Matheus Aguilar](https://github.com/Matheus-Aguilar) 
 * [Lucas Reis](https://github.com/lucas-t-reis)
+
+### Credits
+* Thief image by <a href="https://pixabay.com/users/OpenClipart-Vectors-30363/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=157142">OpenClipart-Vectors</a> from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=157142">Pixabay</a>
